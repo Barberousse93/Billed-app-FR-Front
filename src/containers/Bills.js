@@ -13,15 +13,17 @@ export default class {
     if (buttonNewBill)
       buttonNewBill.addEventListener("click", this.handleClickNewBill)
     const iconEye = document.querySelectorAll(`div[data-testid="icon-eye"]`)
-    if (iconEye)
+    // console.log(iconEye)
+    if (iconEye.length > 0) {
       iconEye.forEach((icon) => {
         icon.addEventListener("click", () => this.handleClickIconEye(icon))
       })
+    }
+
     new Logout({ document, localStorage, onNavigate })
   }
 
   handleClickNewBill = () => {
-    console.log("Clic le bouton !")
     this.onNavigate(ROUTES_PATH["NewBill"])
   }
 
@@ -42,30 +44,26 @@ export default class {
         .bills()
         .list()
         .then((snapshot) => {
-          const bills = snapshot
-            // .sort(function (a, b) {
-            //   return a.date < b.date ? 1 : -1
-            // })
-            .map((doc) => {
-              try {
-                return {
-                  ...doc,
-                  formattedDate: formatDate(doc.date), // <--- BEURK !!
-                  date: doc.date,
-                  status: formatStatus(doc.status),
-                }
-              } catch (e) {
-                // if for some reason, corrupted data was introduced, we manage here failing formatDate function
-                // log the error and return unformatted date in that case
-                console.log(e, "for", doc)
-                return {
-                  ...doc,
-                  date: doc.date,
-                  status: formatStatus(doc.status),
-                }
+          const bills = snapshot.map((doc) => {
+            try {
+              return {
+                ...doc,
+                formattedDate: formatDate(doc.date), // !!!
+                date: doc.date,
+                status: formatStatus(doc.status),
               }
-            })
-          console.log("length", bills.length)
+            } catch (e) {
+              // if for some reason, corrupted data was introduced, we manage here failing formatDate function
+              // log the error and return unformatted date in that case
+              // console.log(e, "for", doc)
+              return {
+                ...doc,
+                date: doc.date,
+                status: formatStatus(doc.status),
+              }
+            }
+          })
+          // console.log("length", bills.length)
 
           return bills
         })
